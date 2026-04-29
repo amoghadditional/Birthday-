@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Memory Challenge</title>
+
+<style>
+:root {
+    --primary-pink: #ff85a2;
+    --soft-bg: #fff5f7;
+    --dark-text: #4a4a4a;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--soft-bg);
+    color: var(--dark-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.quiz-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+}
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+button {
+    padding: 12px;
+    border: 2px solid var(--primary-pink);
+    background: transparent;
+    color: var(--primary-pink);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: var(--primary-pink);
+    color: white;
+}
+
+textarea {
+    width: 90%;
+    height: 70px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-family: inherit;
+    resize: none;
+}
+
+.hidden { display: none; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="game-container">
+
+<div id="intro">
+    <h1>Happy Birthday, Baby!❤️</h1>
+    <p>Score at least 5 to unlock your surprise!</p>
+    <button onclick="startQuiz()">Start</button>
+</div>
+
+<div id="quiz" class="hidden">
+    <h2 id="question-title"></h2>
+    <img id="question-img" class="quiz-img">
+    <p id="question-text"></p>
+    <div id="btn-container" class="btn-grid"></div>
+    <p>Score: <span id="score">0</span>/6</p>
+</div>
+
+<div id="result" class="hidden">
+    <h1 id="result-title"></h1>
+    <p id="result-text"></p>
+
+    <div id="gift" class="hidden">
+        <p><strong>Text your boyfriend to receive your gift!</strong></p>
+    </div>
+
+    <div id="feedback-box" class="hidden">
+        <h3>Leave feedback about your boyfriend!😛</h3>
+        <textarea id="feedback-input" placeholder="Write something spicy, maybe? ;)"></textarea>
+        <br><br>
+        <button onclick="submitFeedback()">Send</button>
+        <p id="feedback-msg"></p>
+    </div>
+
+    <button onclick="location.reload()">Play Again</button>
+</div>
+
+</div>
+
+<script>
+
+const questions = [
+{
+q:"What was I wearing the first time we truly interacted?",
+a:["White","Blue","Black","Pink"],
+c:3,
+img:"image1.jpeg"
+},
+{
+q:"What is our collective favorite spot?",
+a:["Yelahanka","Kenchenahalli Lake","The University Bus","My Place"],
+c:1,
+img:"image2.jpeg"
+},
+{
+q:"When was our first date? (Answer without opening your gallery!)",
+a:["29th January","25th January","2nd February","We haven't been on one yet!🥺"],
+c:1,
+img:"image3.jpeg"
+},
+{
+q:"What was I feeling here?",
+a:["Happy","Hungry","Tired","Nervous"],
+c:3,
+img:"image4.jpeg"
+},
+{
+q:"Finish this line from 'Mausoleum': I'd kill to touch your _____ _____ hands.",
+a:["rough, hairy","pretty, tiny","soft, bony","cute, lovely"],
+c:2,
+img:"image5.jpeg"
+},
+{
+q:"Finally! When's my birthday, nincompoop?!",
+a:["13th July","12th June","21st July","13th June"],
+c:3,
+img:"image6.jpeg"
+}
+];
+
+let index = 0;
+let score = 0;
+
+function startQuiz(){
+    document.getElementById("intro").classList.add("hidden");
+    document.getElementById("quiz").classList.remove("hidden");
+    showQuestion();
+}
+
+function showQuestion(){
+    let q = questions[index];
+    document.getElementById("question-title").innerText = "Question " + (index+1);
+    document.getElementById("question-text").innerText = q.q;
+    document.getElementById("question-img").src = q.img;
+
+    let btns = document.getElementById("btn-container");
+    btns.innerHTML = "";
+
+    q.a.forEach((choice,i)=>{
+        let b = document.createElement("button");
+        b.innerText = choice;
+        b.onclick = ()=>answer(i);
+        btns.appendChild(b);
+    });
+
+    if(index === 1){
+        let hiddenBtn = document.createElement("button");
+        hiddenBtn.innerText = "❤️";
+        hiddenBtn.style.opacity = "0.35";
+        hiddenBtn.style.fontSize = "14px";
+        hiddenBtn.style.padding = "6px";
+        hiddenBtn.style.border = "none";
+        hiddenBtn.style.background = "transparent";
+        hiddenBtn.onclick = ()=>{
+            alert("Anyplace as long as we're together❤️");
+        };
+        btns.appendChild(hiddenBtn);
+    }
+}
+
+function answer(i){
+    if(i === questions[index].c){
+        score++;
+        document.getElementById("score").innerText = score;
+    }
+
+    index++;
+
+    if(index < questions.length){
+        showQuestion();
+    } else {
+        endGame();
+    }
+}
+
+function endGame(){
+    document.getElementById("quiz").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+
+    document.getElementById("result-text").innerText = "You scored " + score + "/6";
+    document.getElementById("feedback-box").classList.remove("hidden");
+
+    if(score >= 5){
+        document.getElementById("result-title").innerText = "You Win, Sweet pea!";
+        document.getElementById("gift").classList.remove("hidden");
+    } else {
+        document.getElementById("result-title").innerText = "Try Again!";
+    }
+}
+
+function submitFeedback(){
+    let text = document.getElementById("feedback-input").value;
+
+    if(text.trim() !== ""){
+        emailjs.send(
+            "service_qkneg2j",
+            "template_udwq5mh",
+            {
+                message: text
+            },
+            {
+                publicKey: "5284ssmAcib9DBrYc"
+            }
+        )
+        .then(function(){
+            document.getElementById("feedback-msg").innerText = "Noted, mademoisselle!";
+            document.getElementById("feedback-input").value = "";
+        })
+        .catch(function(error){
+            document.getElementById("feedback-msg").innerText = "Oops! Failed to send! If you see this, reach out to the person who sent you this!";
+            console.error("EmailJS Error:", error);
+            alert("Error: " + JSON.stringify(error));
+        });
+    } else {
+        document.getElementById("feedback-msg").innerText = "Hey! Say something! Punk!😤";
+    }
+}
+
+</script>
+
+</body>
+</html>
