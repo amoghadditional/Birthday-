@@ -76,7 +76,6 @@ textarea {
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
 </head>
 
 <body>
@@ -94,7 +93,7 @@ textarea {
     <img id="question-img" class="quiz-img">
     <p id="question-text"></p>
     <div id="btn-container" class="btn-grid"></div>
-    <p>Score: <span id="score">0</span>/6</p>
+    <p>Score: <span id="score">0</span>/8</p>
 </div>
 
 <div id="result" class="hidden">
@@ -156,6 +155,18 @@ q:"Finally! When's my birthday, nincompoop?!",
 a:["13th July","12th June","21st July","13th June"],
 c:3,
 img:"image6.jpeg"
+},
+{
+q:"What are you thinking about in this image?",
+a:["Ending world hunger","Rushing back to make out","Taylor Swift (of course not)","Crayons"],
+c:1,
+img:"image7.jpeg"
+},
+{
+q:"If we all lose all of our memories and meet each other again someday down the line, would you still choose me?",
+a:["yes","no"],
+c:0,
+img:"image8.jpeg"
 }
 ];
 
@@ -180,7 +191,15 @@ function showQuestion(){
     q.a.forEach((choice,i)=>{
         let b = document.createElement("button");
         b.innerText = choice;
-        b.onclick = ()=>answer(i);
+
+        if(index === 7 && i === 1){
+            b.disabled = true;
+            b.style.opacity = "0.5";
+            b.style.cursor = "not-allowed";
+        } else {
+            b.onclick = ()=>answer(i);
+        }
+
         btns.appendChild(b);
     });
 
@@ -218,7 +237,7 @@ function endGame(){
     document.getElementById("quiz").classList.add("hidden");
     document.getElementById("result").classList.remove("hidden");
 
-    document.getElementById("result-text").innerText = "You scored " + score + "/6";
+    document.getElementById("result-text").innerText = "You scored " + score + "/8";
     document.getElementById("feedback-box").classList.remove("hidden");
 
     if(score >= 5){
@@ -244,7 +263,7 @@ function submitFeedback(){
             }
         )
         .then(function(){
-            document.getElementById("feedback-msg").innerText = "Noted, mademoisselle!";
+            document.getElementById("feedback-msg").innerText = "Noted, mademoiselle!";
             document.getElementById("feedback-input").value = "";
         })
         .catch(function(error){
